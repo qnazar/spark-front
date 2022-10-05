@@ -110,7 +110,9 @@ export default {
             d3.forceLink().id(d => d.username).links(this.graph.links).distance(150),
         )
         .force('charge', d3.forceManyBody().strength(-200))
-        .force('center', d3.forceCenter(window.innerWidth / 4, window.innerHeight / 2))
+        // .force('center', d3.forceCenter(window.innerWidth / 4, window.innerHeight / 2).strength(0.05))
+        .force("x", d3.forceX(innerWidth / 4))
+        .force("y", d3.forceY(innerHeight / 2))
         .on('tick', ticked)
         .alphaDecay(0.0002);
 
@@ -138,10 +140,11 @@ export default {
         .enter()
         .append('g')
         .attr('class', 'node')
+        .attr('id', d => d.username)
 
     nodes.append('circle')
         .attr('r', 15)
-        .attr('id', d => d.username)
+
         .style('fill', d => d.username === this.username ? 'darkblue' : 'lightblue')
         .style('opacity', d => d.is_active ? '1.0' : '0.5')
         .style('stroke', 'black')
@@ -159,38 +162,72 @@ export default {
     }
 
     this.updateGraph = function () {
-      console.log(this.graph)
+      console.log('FROM UPDATE', this.graph)
       const link = this.svg.select('.links')
           .selectAll('.link')
           .data(this.graph.links);
       link.enter()
-          //.insert('line', '.node')  //  ???
           .append('line')
           .attr('class', 'link')
           .attr('stroke-width', 2)
           .attr('id', d => `${d.source.username}${d.target.username}`)//d.source.username + d.target.username)
           .style('stroke', 'black');
+      link.merge(link);
       link.exit().remove();
+
+      //   НОВИЙ НОД НЕ ДОДАЄТЬСЯ В КІНЕЦЬ СПИСКУ =(
+      // const newNode = this.graph.nodes[this.graph.nodes.length - 1]
+      // console.log(newNode)
+      // let sx = 0;
+      // let sy = 0;
+      // this.graph.nodes.forEach(function(node) {
+      //   sx += node.x;
+      //   sy += node.y;
+      // })
+      // let mx = sx / this.graph.nodes.length;
+      // let my = sy / this.graph.nodes.length;
+      //
+      // newNode.x = mx;
+      // newNode.y = my;
+
 
       const node = this.svg.select('.nodes')
           .selectAll('.node')
           .data(this.graph.nodes);
       const g = node.enter().append('g')
-          .attr('class', 'node');
+          .attr('class', 'node')
+          .attr('id', d => d.username)
+          // .attr('transform', d => {
+          //   console.log(d.x, d.y); return `translate(${d.x},${d.y})`});
       g.append('circle')
           .attr('r', 15)
-          .attr('id', d => d.username)
           .style('fill', d => d.username === this.username ? 'darkblue' : 'lightblue')
           .style('opacity', d => d.is_active ? '1.0' : '0.5')
           .style('stroke', 'black');
       g.append('text')
           .attr('class', 'text')
           .text(d => d.username);
+      node.g.merge(node);
       node.exit().remove();
+
+      function ticked() {
+      link
+          .attr('x1', d => d.source.x)
+          .attr('y1', d => d.source.y)
+          .attr('x2', d => d.target.x)
+          .attr('y2', d => d.target.y)
+      g
+          .attr('transform', d => `translate(${d.x},${d.y})`)
+    }
 
       this.simulation.nodes(this.graph.nodes)
           .force('link', d3.forceLink().id(d => d.username).links(this.graph.links).distance(150))
           .force('charge', d3.forceManyBody().strength(-200))
+          // .force('center', d3.forceCenter(window.innerWidth / 4, window.innerHeight / 2).strength(0.05))
+          .force("x", d3.forceX(innerWidth / 4))
+          .force("y", d3.forceY(innerHeight / 2))
+          .on('tick', ticked)
+          .alpha(0.3)
           .restart();  //was trying to add ticked function - did not help
     }
   },
