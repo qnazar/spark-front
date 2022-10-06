@@ -7,7 +7,7 @@ class SocketioService {
     setupSocketConnection() {
         this.socket = io(process.env.VUE_APP_SOCKET_ENDPOINT);
 
-        this.socket.emit('connection', 'connecting...');
+        this.socket.emit('connection');
     }
 
     disconnect(username) {

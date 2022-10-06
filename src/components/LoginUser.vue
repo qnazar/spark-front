@@ -7,7 +7,7 @@
       <input type="password" v-model.lazy="password" placeholder="Password" class="form-control">
       <button @click="loginUser" type="submit" class="btn btn-primary w-100">Join</button>
     </form>
-    <div v-if="!loginSuccess" class="alert alert-primary">{{ errorMessage }}</div>
+    <div v-show="loginSuccess" class="alert alert-primary">{{ errorMessage }}</div>
   </div>
 
 </template>
@@ -21,22 +21,12 @@ export default {
     return {
       username: '',
       password: '',
-      // loginSuccess: true,
-      // errorMessage: '',
     }
   },
   props: {loginSuccess: {type: Boolean}, errorMessage: {type: String}},
   methods: {
     loginUser() {
       socketioService.loginUser(this.username, this.password);
-      // socketioService.socket.on('login failed', (data) => {
-      //   this.errorMessage = data;
-      //   this.loginSuccess = false;
-      // });
-      // socketioService.socket.on('login success', (data) => {
-      //   this.loginSuccess = true;
-      //   this.$emit('login', {username: data.username, chats: data.chats, graph: data.graph});
-      // });
     },
   }
 }

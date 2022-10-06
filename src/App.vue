@@ -1,13 +1,17 @@
 <template>
   <div id="app">
+
     <LoginUser v-if="!loginSuccess"
                :login-success="loginSuccess"
-               :error-message="errorMessage"></LoginUser>
+               :error-message="errorMessage">
+    </LoginUser>
 
     <MainChat v-else
               :username="username"
               :chats="chats"
-              :graph="graph"></MainChat>
+              :graph="graph">
+    </MainChat>
+
   </div>
 </template>
 
@@ -30,64 +34,83 @@ export default {
     }
   },
   methods: {
-    startChat(data) {
-      this.username = data.username;
-      console.log(this.username)
-      this.loginSuccess = true;
-      this.chats = data.chats;
-      this.graph = data.graph;
-    },
-    // updateGraph(data) {
-    //   this.graph = data.graph;
-    //   console.log('in App')
-    //   console.log(data.graph)
-    // }
+
   },
   created() {
     SocketioService.setupSocketConnection();
 
-    socketioService.socket.on('login failed', (data) => {
-        this.errorMessage = data;
-      });
-    socketioService.socket.on('login success', (data) => {
+    socketioService.socket.on('registration', (data) => {
+      console.log('registration', data)
+      this.username = data.username;
+      this.chats = data.chats;
+      this.graph = data.graph;
+      this.loginSuccess = true;
+    });
+
+    socketioService.socket.on('new node', (node) => {
+      console.log('new node')
+      console.log('before pushing node ', node)
+      this.graph.nodes.push(node);                        // method for pushing node to graph
+      console.log('after pushing node ', node)
+    });
+
+    socketioService.socket.on('login', (data) => {
+      console.log('login', data)
       this.loginSuccess = true;
       this.username = data.username;
       this.chats = data.chats;
       this.graph = data.graph;
-      console.log(this.username + ' from login')
-      // this.$emit('login', {username: data.username, chats: data.chats, graph: data.graph});
     });
 
-    socketioService.socket.on('new connection added', (data) => {
-      console.log('connection added')
-      // this.graph = data.graph;
-      if (this.username === data.username) {
-        this.chats = data.chats;
+    socketioService.socket.on('node active', (node) => {
+      // TODO method for changing the node property
+      console.log('node active')
+      console.log(node)
+      console.log('before changing', this.graph.nodes)
+      for (let n of this.graph.nodes) {
+        if (n.username === node.username) {
+          n.is_active = true
+          break
+        }
       }
+      console.log('after changing', this.graph.nodes)
     });
-    socketioService.socket.on('logout', (data) => {
-      this.graph = data.graph;
+
+    socketioService.socket.on('login failed', (msg) => {
+      this.loginSuccess = false;
+      this.errorMessage = msg;
     });
-    socketioService.socket.on('graph', data => {
-      this.graph = data.graph;
-      console.log('graph from: ' + data.from)
-    })
-  },
-  mounted() {
-    // socketioService.socket.on('new connection added', (data) => {
-    //   console.log('connection added')
-    //   this.graph = data.graph;
-    //   if (this.username === data.username) {
-    //     this.chats = data.chats;
-    //   }
-    // });
-    // socketioService.socket.on('logout', (data) => {
-    //   this.graph = data.graph;
-    // });
-    // socketioService.socket.on('graph', data => {
-    //   this.graph = data.graph;
-    //   console.log('graph get from login')
-    // })
+
+    socketioService.socket.on('add contact', (chats) => {
+      console.log('add contact')
+      this.chats = chats;                                   // maybe change for receiving only new chat and not all list
+    });
+
+    socketioService.socket.on('new links', (links) => {
+      console.log('new links')
+      console.log('before pushing link ', links)
+      this.graph.links.push(links[0])                              // method for pushing links into graph
+      this.graph.links.push(links[1])                              // method for pushing links into graph
+      console.log('after pushing link ', links)
+    });
+
+    socketioService.socket.on('contact does not exist', (msg) => {
+      alert(msg);  // TODO make better alert
+    });
+
+    // 'message' event is in ChatArea. Maybe put it here ?
+
+    socketioService.socket.on('node inactive', (node) => {
+      console.log('node inactive', node)
+      console.log('before changing', this.graph.nodes)
+      for (let n of this.graph.nodes) {
+        if (n.username === node.username) {
+          n.is_active = false
+          break
+        }
+      }
+      console.log('after changing', this.graph.nodes)
+    });
   },
   beforeUnmount() {
     SocketioService.disconnect(this.username);
