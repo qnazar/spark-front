@@ -6,6 +6,7 @@
 
 <script>
 import * as d3 from 'd3'
+import socketioService from "../../services/socketio.service";
 export default {
   name: "GraphVisual",
   data() {
@@ -31,12 +32,12 @@ export default {
             'link',
             d3.forceLink().id(d => d.username).links(this.graph.links).distance(150),
         )
-        .force('charge', d3.forceManyBody().strength(-500))
-        // .force('center', d3.forceCenter(window.innerWidth / 4, window.innerHeight / 2).strength(0.05))
+        .force('charge', d3.forceManyBody().strength(-1000))
         .force("x", d3.forceX(innerWidth / 4))
         .force("y", d3.forceY(innerHeight / 2))
         .on('tick', ticked)
-        .alphaDecay(0.0002);
+        .alphaTarget(0)
+        .alphaDecay(0.02);
 
     this.svg = d3.select('#graph')
         .append('svg')
@@ -53,7 +54,8 @@ export default {
         .attr('stroke-width', 2)
         .attr('class', 'link')
         .attr('id', d => `${d.source.username}-${d.target.username}`)
-        .style('stroke', 'black');
+        .style('stroke', 'black')
+        .style('opacity', 0.5);
 
     const nodes = this.svg.append('g')
         .attr('class', 'nodes')
@@ -65,13 +67,14 @@ export default {
         .attr('id', d => d.username)
 
     nodes.append('circle')
-        .attr('r', 15)
-
+        .attr('r', 20)
         .style('fill', d => d.username === this.username ? 'darkblue' : 'lightblue')
         .style('opacity', d => d.is_active ? '1.0' : '0.5')
         .style('stroke', 'black')
 
     nodes.append('text').text(d => d.username)
+        .style('font-size', 18)
+        .attr("dx", 20)
 
     function ticked() {
       link
@@ -81,7 +84,7 @@ export default {
           .attr('y2', d => d.target.y)
       nodes
           .attr('transform', d => `translate(${d.x},${d.y})`)
-    }
+      }
     }
   },
   computed: {
@@ -124,15 +127,41 @@ export default {
       }
     }
   },
+  created() {
+    socketioService.socket.on('msg visual', (data) => {
+      console.log(data)
+      const line = d3.select(`#${data.from}-${data.to}`)
+      this.svg.append('line')
+          .attr('id', 'animation')
+          .attr('x1', line.attr('x1'))
+          .attr('y1', line.attr('y1'))
+          .attr('x2', line.attr('x1'))
+          .attr('y2', line.attr('y1'))
+          .style('stroke', 'steelblue')
+          .style('stroke-width', '4px')
+          .transition()
+          .duration(1000)
+          .attr('x2', line.attr('x2'))
+          .attr('y2', line.attr('y2'))
+
+      setTimeout(function (){
+        d3.select('#animation').remove()
+      }, 1000)
+    })
+  },
   mounted() {
     console.log('GRAPH IS MOUNTING', this.graph)
     this.drawGraph()
-  }
+  },
 }
 
 
 </script>
 
 <style scoped>
-
+path {
+  stroke: red;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
 </style>

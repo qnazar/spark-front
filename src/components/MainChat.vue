@@ -8,7 +8,7 @@
       <h5><span class="badge bg-primary">Chat with {{currentChat}}</span></h5>
       <chat-area :destination="currentChat" :username="username"></chat-area>
     </div>
-    <div class="col-6 p-3">
+    <div class="col-6 p-3" style="overflow: hidden">
       <graph-visual :graph="graph" :username="username"></graph-visual>
     </div>
   </div>

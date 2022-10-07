@@ -23,14 +23,6 @@ export default {
   created() {
     socketioService.socket.on('message', (message) => {
       this.messages.push(message);
-      const channel = document.getElementById(`${this.destination}-${this.username}`)
-      console.log(channel)
-      channel.style.stroke = 'red'
-      channel.style.strokeWidth = '5px'
-      setTimeout(function () {
-        channel.style.stroke = 'black'
-        channel.style.strokeWidth = '2px'
-      }, 500)
     })
   },
   data() {
@@ -52,13 +44,6 @@ export default {
       socketioService.sendMsg(this.message, this.username, this.destination);
       this.messages.push({'message': this.message, 'sender': 'You', 'destination': this.destination});
       this.message = '';
-      const channel = document.getElementById(`${this.username}-${this.destination}`)
-      console.log(channel)
-      channel.style.stroke = 'red'
-      setTimeout(function () {
-        channel.style.stroke = 'black'
-      }, 500)
-
     },
   },
 }
