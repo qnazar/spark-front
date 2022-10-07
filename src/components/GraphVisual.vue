@@ -1,7 +1,5 @@
 <template>
- <div id="graph">
-
- </div>
+ <div id="graph"></div>
 </template>
 
 <script>
@@ -64,36 +62,34 @@ export default {
         .enter()
         .append('g')
         .attr('class', 'node')
-        .attr('id', d => d.username)
+        .attr('id', d => d.username);
 
     nodes.append('circle')
         .attr('r', 20)
         .style('fill', d => d.username === this.username ? 'darkblue' : 'lightblue')
         .style('opacity', d => d.is_active ? '1.0' : '0.5')
-        .style('stroke', 'black')
+        .style('stroke', 'black');
 
     nodes.append('text').text(d => d.username)
         .style('font-size', 18)
-        .attr("dx", 20)
+        .attr("dx", 20);
 
     function ticked() {
       link
           .attr('x1', d => d.source.x)
           .attr('y1', d => d.source.y)
           .attr('x2', d => d.target.x)
-          .attr('y2', d => d.target.y)
+          .attr('y2', d => d.target.y);
       nodes
-          .attr('transform', d => `translate(${d.x},${d.y})`)
+          .attr('transform', d => `translate(${d.x},${d.y})`);
       }
     }
   },
   computed: {
     nodesLength() {
-      console.log('NODES LENGTH CHANGES')
       return this.graph.nodes.length;
     },
     linksLength() {
-      console.log('LINKS LENGTH CHANGES')
       return this.graph.links.length;
     },
     isActive() {
@@ -106,30 +102,26 @@ export default {
   },
   watch: {
     nodesLength: {handler() {
-      console.log('change of nodes in graph')  // update graph here
-      this.simulation.stop()
-      d3.select('svg').remove()
-      this.drawGraph()
+      this.simulation.stop();
+      d3.select('svg').remove();
+      this.drawGraph();
       }
     },
     linksLength: {handler() {
-        console.log('change of links in graph')  // update graph here
-        this.simulation.stop()
-        d3.select('svg').remove()
-        this.drawGraph()
+        this.simulation.stop();
+        d3.select('svg').remove();
+        this.drawGraph();
       }
     },
     isActive: {handler() {
-        console.log('change of activity in graph')
-        this.simulation.stop()
-        d3.select('svg').remove()
-        this.drawGraph()
+        this.simulation.stop();
+        d3.select('svg').remove();
+        this.drawGraph();
       }
     }
   },
   created() {
     socketioService.socket.on('msg visual', (data) => {
-      console.log(data)
       const line = d3.select(`#${data.from}-${data.to}`)
       this.svg.append('line')
           .attr('id', 'animation')
@@ -142,7 +134,7 @@ export default {
           .transition()
           .duration(1000)
           .attr('x2', line.attr('x2'))
-          .attr('y2', line.attr('y2'))
+          .attr('y2', line.attr('y2'));
 
       setTimeout(function (){
         d3.select('#animation').remove()
@@ -150,8 +142,7 @@ export default {
     })
   },
   mounted() {
-    console.log('GRAPH IS MOUNTING', this.graph)
-    this.drawGraph()
+    this.drawGraph();
   },
 }
 
@@ -159,9 +150,5 @@ export default {
 </script>
 
 <style scoped>
-path {
-  stroke: red;
-  stroke-width: 5;
-  stroke-linecap: round;
-}
+
 </style>

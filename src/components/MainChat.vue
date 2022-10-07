@@ -1,16 +1,30 @@
 <template>
   <div class="row">
+
     <div class="col-2 p-3">
       <h2 class="text-center"><span class="badge bg-primary">{{ username }}</span></h2>
-      <chat-list :username="username" :chats="chats" @changechat="openChat"></chat-list>
+      <chat-list
+          :username="username"
+          :chats="chats"
+          @changechat="openChat">
+      </chat-list>
     </div>
+
     <div class="col-4 p-3" @chat-selected="openChat">
       <h5><span class="badge bg-primary">Chat with {{currentChat}}</span></h5>
-      <chat-area :destination="currentChat" :username="username"></chat-area>
+      <chat-area
+          :destination="currentChat"
+          :username="username">
+      </chat-area>
     </div>
+
     <div class="col-6 p-3" style="overflow: hidden">
-      <graph-visual :graph="graph" :username="username"></graph-visual>
+      <graph-visual
+          :graph="graph"
+          :username="username">
+      </graph-visual>
     </div>
+
   </div>
 
 </template>
@@ -41,8 +55,7 @@ export default {
   },
   methods: {
     openChat(data) {
-      this.currentChat = data
-      console.log('chat selected in MainChat');
+      this.currentChat = data;
     },
   }
 }

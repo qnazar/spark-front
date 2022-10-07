@@ -3,9 +3,22 @@
     <h1 style="text-align: center">Welcome to SparkChat</h1>
     <h6 style="text-align: center">Please, login to start chatting</h6>
     <form @submit.prevent="loginUser">
-      <input type="text" v-model.lazy="username" placeholder="Username" class="form-control">
-      <input type="password" v-model.lazy="password" placeholder="Password" class="form-control">
-      <button @click="loginUser" type="submit" class="btn btn-primary w-100">Join</button>
+      <input
+          type="text"
+          v-model.lazy="username"
+          placeholder="Username"
+          class="form-control">
+      <input
+          type="password"
+          v-model.lazy="password"
+          placeholder="Password"
+          class="form-control">
+      <button
+          @click="loginUser"
+          type="submit"
+          class="btn btn-primary w-100">
+        Join
+      </button>
     </form>
     <div v-show="loginSuccess" class="alert alert-primary">{{ errorMessage }}</div>
   </div>

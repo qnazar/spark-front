@@ -1,15 +1,25 @@
 <template>
   <div>
     <form @submit.prevent class="input-group my-3">
-      <input type="text" placeholder="Add chat" v-model.lazy="addUser" class="form-control">
+
+      <input
+          type="text"
+          placeholder="Add chat"
+          v-model.lazy="addUser"
+          class="form-control">
+
       <button type="submit" @click="addChat" class="btn btn-outline-primary">Add</button>
+
     </form>
   </div>
+
   <div>
     <div v-for="name in chats" :key="name" class="list-group">
-      <chat-item :name="name" @changechat="changeChat"></chat-item>
+      <chat-item
+          :name="name"
+          @changechat="changeChat">
+      </chat-item>
     </div>
-
   </div>
 </template>
 
